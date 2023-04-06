@@ -1,2 +1,5 @@
 # IntelliJ Generated Files
 .idea
+
+# Node Modules
+node_modules
