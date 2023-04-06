@@ -1,0 +1,11 @@
+{
+  "name": "proud-circle-mineflayer-bot",
+  "version": "1.0.0",
+  "description": "Mineflayer bot to link discord and hypixel data for Proud Circle (online members, guild chat, rank management)",
+  "main": "index.js",
+  "scripts": {
+    "bot": "node index.js"
+  },
+  "author": "itzilly",
+  "license": "MIT"
+}
