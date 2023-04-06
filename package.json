@@ -9,6 +9,7 @@
   "author": "itzilly",
   "license": "MIT",
   "dependencies": {
-    "mineflayer": "^4.8.1"
+    "mineflayer": "^4.8.1",
+    "toml": "^3.0.0"
   }
 }
