@@ -1,6 +1,7 @@
 import mineflayer from 'mineflayer'
-import { EventEmitter } from 'events';
-import ConfigHandler from "./config.js";
+import { EventEmitter } from 'events'
+import { EmbedBuilder, WebhookClient } from "discord.js"
+import ConfigHandler from "./config.js"
 import { GuildMessage, GuildMessageSender, OfficerMessage } from './eventTypes.js'
 
 
@@ -13,6 +14,9 @@ const chatEvents = new EventEmitter();
 
 // Start Bot
 const username = configHandler.get('email')  // Silly variable name
+if (username === '') {
+    process.exit(101)
+}
 const bot = mineflayer.createBot({
     host: 'play.hypixel.net',
     username: username,
@@ -20,12 +24,16 @@ const bot = mineflayer.createBot({
     version: '1.8.9'
 })
 
+// Add Webhook Client
+const webhookUrl = "https://discord.com/api/webhooks/1093727005444415571/ddV6rgvb6WyC8A1JMw73tFLB4g5XBUGQkd9kPipp3BK_m2mLFDDLsCRfyu__wfWuncfH"
+const webhookClient = new WebhookClient({ url: webhookUrl });
 
-function parseChatMessage(jsonChatMessage): void {
+
+function parseGuildMessage(jsonChatMessage): void {
     const extras = jsonChatMessage.json.extra
     let extra_prefix = extras[0].text
 
-    if (extra_prefix.startsWith("§2Guild >") || extra_prefix.startsWith("§3Officer > ")) {
+    if (extra_prefix.startsWith("§2Guild >") || extra_prefix.startsWith("§aO > ")) {
         // Guild Chat Event
         let hypixel_rank = null
         let username = null
@@ -49,30 +57,93 @@ function parseChatMessage(jsonChatMessage): void {
         if (extra_prefix.startsWith("§2Guild >")) {
             let guildMessage: GuildMessage = new GuildMessage(message, guildMessageSender)
             chatEvents.emit('guildmsg', guildMessage)
-        } else if (extra_prefix.startsWith("§3Officer > ")) {
+        } else if (extra_prefix.startsWith("§aO > ")) {
             let officerMessage: OfficerMessage = new OfficerMessage(message, guildMessageSender)
             chatEvents.emit('officermsg', officerMessage)
         }
     }
 }
 
+function parsePersonalMessage(message: string): void {
+    let fromPortion = message.split(": ")
+    if (!(fromPortion[0].startsWith("From "))) {
+        return;
+    }
+    let fromSplit = fromPortion[0].split(" ")
+    if (fromSplit[fromSplit.length - 1] != "illyum") {
+        return;
+    }
+
+    let contents = fromPortion[1]
+    if (contents.startsWith("!joinparty")) {
+        bot.chat("/party accept illyum")
+    } else if (contents.startsWith("!say ")) {
+        bot.chat("/gc " + contents.replace("!say ", ""))
+    }  if (contents.startsWith("!reply ")) {
+        bot.chat("/msg illyum " + contents.replace("!reply ", ""))
+    }
+}
+
+bot.once('spawn', () => {
+    console.log("Bot Logged In!")
+})
+
 bot.on('message', async (jsonMsg, position) => {
     try {
-        parseChatMessage(jsonMsg)
-    } catch (error) {
+        parseGuildMessage(jsonMsg)
+    } catch (err) {}
+})
 
+bot.on('messagestr', (message, position, jsonMsg) => {
+    try {
+        parsePersonalMessage(message)
+    } catch (err) {}
+})
+
+
+chatEvents.on('guildmsg', (guildMessage: GuildMessage) => {
+    const guildRank: string = guildMessage.getSender().getCleanGuildRank()
+    const username: string = guildMessage.getSender().getCleanUsername()
+    const msg: string = guildMessage.getContent()
+    console.log(`Guild > [${guildRank}] [${username}]: ${guildMessage.getContent()}`)
+    if (msg.startsWith("!")) {
+        if (guildMessage.getContent().startsWith("!joinparty")) {
+            bot.chat("/party accept " + username)
+        } else if (guildMessage.getContent().startsWith("!say ")) {
+            bot.chat("/gc " + guildMessage.getContent().replace("!say ", ""))
+        }
+    } else {
+        console.log("Sending data 1")
+        const embed = new EmbedBuilder()
+            .setTitle('Some Title')
+            .setColor(0x00FFFF);
+
+        webhookClient.send({
+            content: 'Guild Message: ',
+            embeds: [embed],
+        });
+    }
+
+
+    console.log(`Guild > [${guildRank}] [${username}]: ${guildMessage.getContent()}`)
+    if (guildRank === "Staff") {
+        if (guildMessage.getContent().startsWith("!joinparty")) {
+            bot.chat("/party accept " + username)
+        } else if (guildMessage.getContent().startsWith("!say ")) {
+            bot.chat("/gc " + guildMessage.getContent().replace("!say ", ""))
+        }
     }
 })
 
-chatEvents.on('guildmsg', (guildMessage) => {
-    const guildRank: string = guildMessage.getSender.getCleanGuildRank()
+chatEvents.on('officermsg', (guildMessage: GuildMessage) => {
+    const guildRank: string = guildMessage.getSender().getCleanGuildRank()
     const username: string = guildMessage.getSender().getCleanUsername()
-    console.log(`Guild > [${guildRank}] [${username}]`)
-})
-
-chatEvents.on('officermsg', (guildMessage) => {
-    const guildRank: string = guildMessage.getSender.getCleanGuildRank()
-    const username: string = guildMessage.getSender().getCleanUsername()
-    console.log(`Officer > [${guildRank}] [${username}]`)
+    const msg: string = guildMessage.getContent()
+    console.log(`Officer > [${username}]: ${guildMessage.getContent()}`)
+    if (guildMessage.getContent().startsWith("!joinparty")) {
+        bot.chat("/party accept " + username)
+    } else if (guildMessage.getContent().startsWith("!say ")) {
+        bot.chat("/gc " + guildMessage.getContent().replace("!say ", ""))
+    }
 })
 
