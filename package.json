@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"type": "module",
 	"scripts": {
-		"bot": "node index.js",
+		"bot": "tsc && node dist\\index.js",
 		"build": "tsc",
 		"postinstall": "patch-package"
 	},
