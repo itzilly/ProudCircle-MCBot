@@ -1,6 +1,6 @@
 import mineflayer from 'mineflayer'
 import { EventEmitter } from 'events';
-import { ConfigHandler } from './config.js'
+import ConfigHandler from "./config.js";
 import { GuildMessage, GuildMessageSender, OfficerMessage } from './eventTypes.js'
 
 
