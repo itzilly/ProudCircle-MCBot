@@ -1,7 +1,9 @@
 # IntelliJ Generated Files
 .idea
 
-# Node Modules
+# Node Specific Files/Folders
 node_modules
+package-lock.json
+
 # Build
 dist
