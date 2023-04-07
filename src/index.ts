@@ -57,7 +57,11 @@ function parseChatMessage(jsonChatMessage): void {
 }
 
 bot.on('message', async (jsonMsg, position) => {
-    parseChatMessage(jsonMsg)
+    try {
+        parseChatMessage(jsonMsg)
+    } catch (error: TypeError) {
+
+    }
 })
 
 chatEvents.on('guildmsg', (guildMessage) => {
