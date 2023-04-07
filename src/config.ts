@@ -1,6 +1,9 @@
 import fs from "fs";
 
 export default class ConfigHandler {
+    private readonly configFilePath: string;
+    private config: object;
+
     constructor(configFilePath) {
         this.configFilePath = configFilePath;
         this.config = {};
@@ -11,7 +14,7 @@ export default class ConfigHandler {
         }
     }
 
-    createConfig() {
+    private createConfig() {
         this.config = {
             email: '',
             version: 1
@@ -19,20 +22,21 @@ export default class ConfigHandler {
         this.saveConfig();
     }
 
-    loadConfig() {
+    private loadConfig() {
         const configData = fs.readFileSync(this.configFilePath, 'utf8');
         this.config = JSON.parse(configData);
     }
 
-    saveConfig() {
+    private saveConfig() {
         fs.writeFileSync(this.configFilePath, JSON.stringify(this.config, null, 2), 'utf8');
     }
 
-    get(key) {
+    public get(key) {
         return this.config[key];
     }
 
-    set(key, value) {
+
+    public set(key, value) {
         this.config[key] = value;
         this.saveConfig();
     }
