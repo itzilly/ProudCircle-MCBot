@@ -17,7 +17,8 @@ export default class ConfigHandler {
     private createConfig() {
         this.config = {
             email: '',
-            version: 1
+            webhook_url: '',
+            version: 2
         };
         this.saveConfig();
     }
