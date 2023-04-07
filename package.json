@@ -12,6 +12,7 @@
 	"author": "itzilly",
 	"license": "MIT",
 	"dependencies": {
+		"discord.js": "^14.9.0",
 		"patch-package": "^6.5.1",
 		"postinstall-postinstall": "^2.1.0",
 		"prismarine-registry": "^1.7.0",
