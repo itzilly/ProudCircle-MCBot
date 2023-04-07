@@ -59,7 +59,7 @@ function parseChatMessage(jsonChatMessage): void {
 bot.on('message', async (jsonMsg, position) => {
     try {
         parseChatMessage(jsonMsg)
-    } catch (error: TypeError) {
+    } catch (error) {
 
     }
 })
