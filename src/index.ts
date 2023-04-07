@@ -1,7 +1,7 @@
 import mineflayer from 'mineflayer'
 import { EventEmitter } from 'events'
-import { EmbedBuilder, WebhookClient } from "discord.js"
-import ConfigHandler from "./config.js"
+import {EmbedBuilder, hyperlink, WebhookClient} from 'discord.js'
+import ConfigHandler from './config.js'
 import { GuildMessage, GuildMessageSender, OfficerMessage } from './eventTypes.js'
 
 
@@ -25,7 +25,7 @@ const bot = mineflayer.createBot({
 })
 
 // Add Webhook Client
-const webhookUrl = "https://discord.com/api/webhooks/1093727005444415571/ddV6rgvb6WyC8A1JMw73tFLB4g5XBUGQkd9kPipp3BK_m2mLFDDLsCRfyu__wfWuncfH"
+const webhookUrl = configHandler.get('webhook_url')
 const webhookClient = new WebhookClient({ url: webhookUrl });
 
 
@@ -70,7 +70,7 @@ function parsePersonalMessage(message: string): void {
         return;
     }
     let fromSplit = fromPortion[0].split(" ")
-    if (fromSplit[fromSplit.length - 1] != "illyum") {
+    if (fromSplit[fromSplit.length - 1] !== "illyum") {
         return;
     }
 
@@ -105,7 +105,11 @@ chatEvents.on('guildmsg', (guildMessage: GuildMessage) => {
     const guildRank: string = guildMessage.getSender().getCleanGuildRank()
     const username: string = guildMessage.getSender().getCleanUsername()
     const msg: string = guildMessage.getContent()
-    console.log(`Guild > [${guildRank}] [${username}]: ${guildMessage.getContent()}`)
+
+    if (username === "ProudCircle") {
+        return
+    }
+
     if (msg.startsWith("!")) {
         if (guildMessage.getContent().startsWith("!joinparty")) {
             bot.chat("/party accept " + username)
@@ -113,17 +117,20 @@ chatEvents.on('guildmsg', (guildMessage: GuildMessage) => {
             bot.chat("/gc " + guildMessage.getContent().replace("!say ", ""))
         }
     } else {
-        console.log("Sending data 1")
+        let content: string
+        if (guildMessage.getSender().getCleanHypixelRank() === null) {
+            content = `[${username}] ${guildRank}: \`${msg}\``
+        } else {
+            content = `[${guildMessage.getSender().getCleanHypixelRank()}] [${username}] ${guildRank}: \`${msg}\``
+        }
         const embed = new EmbedBuilder()
-            .setTitle('Some Title')
-            .setColor(0x00FFFF);
+            .setTitle(content)
+            .setColor(0x00AA00);
 
         webhookClient.send({
-            content: 'Guild Message: ',
-            embeds: [embed],
+            embeds: [embed]
         });
     }
-
 
     console.log(`Guild > [${guildRank}] [${username}]: ${guildMessage.getContent()}`)
     if (guildRank === "Staff") {
