@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "description": "Mineflayer bot to link discord and hypixel data for Proud Circle (online members, guild chat, rank management)",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "bot": "node index.js"
+    "bot": "node index.js",
+    "build": "tsc"
   },
   "author": "itzilly",
   "license": "MIT",
   "dependencies": {
-    "mineflayer": "^4.8.1",
     "toml": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "mineflayer": "^4.8.1",
+    "typescript": "^5.0.3"
   }
 }
