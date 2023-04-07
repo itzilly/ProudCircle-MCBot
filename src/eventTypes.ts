@@ -1,5 +1,5 @@
 function cleanFormatting(rawString): string {
-    const formattingRegex: RegExp = /§[0-9a-fklmnor]+|[\[\]]+/g
+    const formattingRegex: RegExp = /§[0-9a-fklmnor]+|[\[\]:]+/g
     return rawString.replace(formattingRegex, '')
 }
 
